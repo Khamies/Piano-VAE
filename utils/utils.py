@@ -36,7 +36,28 @@ def post_process_sequence_batch(batch_tuple):
     
     return input_sequence_batch_transposed, output_sequence_batch_sorted, list(lengths_batch_sorted_list)
 
+def interpolate(model, n_interpolations, sequence_length, sos=None):
 
+  # # Get input.
+
+  z1 = torch.randn((1,1,latent_size)).to(device)
+  z2 = torch.randn((1,1,latent_size)).to(device)
+
+  tone1 = model.inference(sequence_length, z1, sos)
+  tone2 = model.inference(sequence_length , z2, sos)
+
+  alpha_s = torch.linspace(0,1,n_interpolations)
+
+  interpolations = torch.stack([alpha*z1 + (1-alpha)*z2  for alpha in alpha_s])
+
+
+  samples = [model.inference(sequence_length ,z, sos) for z in interpolations]
+
+
+  samples = torch.stack(samples)
+
+  return samples, tone1, tone2
+  
 def plot_elbo(losses, mode):
     elbo_loss = list(map(lambda x: x[0], losses))
     kl_loss = list(map(lambda x: x[1], losses))
