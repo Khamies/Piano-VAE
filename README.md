@@ -115,7 +115,7 @@ An interpolation close to "second audio"
 
 ## Play with the model
 
-To play with the model, a jupyter notebook has been provided, you can find it [here](https://github.com/Khamies/PianoNotes-LSTM-Generation/blob/main/Play_with_model.ipynb)
+To play with the model, a jupyter notebook has been provided, you can find it [here](https://github.com/Khamies/Piano-VAE/blob/main/Play_with_model.ipynb)
 
 ### Citation
 
