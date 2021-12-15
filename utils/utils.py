@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from settings import training_setting
+from settings import model_setting
 import torch
 
 
@@ -36,12 +36,12 @@ def post_process_sequence_batch(batch_tuple):
     
     return input_sequence_batch_transposed, output_sequence_batch_sorted, list(lengths_batch_sorted_list)
 
-def interpolate(model, n_interpolations, sequence_length, sos=None):
+def interpolate(model, n_interpolations, sequence_length, sos=None, device = "cuda" if torch.cuda.is_available() else "cpu"):
 
   # # Get input.
 
-  z1 = torch.randn((1,1,latent_size)).to(device)
-  z2 = torch.randn((1,1,latent_size)).to(device)
+  z1 = torch.randn((1,1,model_setting["latent_size"])).to(device)
+  z2 = torch.randn((1,1,model_setting["latent_size"])).to(device)
 
   tone1 = model.inference(sequence_length, z1, sos)
   tone2 = model.inference(sequence_length , z2, sos)
@@ -57,7 +57,8 @@ def interpolate(model, n_interpolations, sequence_length, sos=None):
   samples = torch.stack(samples)
 
   return samples, tone1, tone2
-  
+
+
 def plot_elbo(losses, mode):
     elbo_loss = list(map(lambda x: x[0], losses))
     kl_loss = list(map(lambda x: x[1], losses))
