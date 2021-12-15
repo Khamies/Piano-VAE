@@ -87,15 +87,15 @@ Here are generated samples from the model. We randomly sampled two latent codes 
 
 #### 2. Interpolation
 
-The "President" word has been used as the start of the sentences. We randomly generated two sentences and interpolated between them.
+Here are some samples from the interpolation test. We use number of interpolation = 32, and sequence length = 200.
 
-- first audio:
+- First audio:
 
   <p align="center">
    <a href="https://youtu.be/W3BkL7wv2Zo">  <img src="http://img.youtube.com/vi/W3BkL7wv2Zo/0.jpg?raw=true" alt="First audio"/> </a>
   </p>
 
-- second audio:
+- Second audio:
 
   <p align="center">
    <a href="https://youtu.be/bJidY5IIzrc">  <img src="http://img.youtube.com/vi/bJidY5IIzrc/0.jpg?raw=true" alt="Second audio"/> </a>
