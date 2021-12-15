@@ -62,7 +62,13 @@ def midiwrite(filename, piano_roll, r=(21, 109), dt=0.2, patch=0):
   midi.start_of_track() 
   midi.patch_change(channel=0, patch=patch)
   t = 0
-  samples = [i.nonzero()[0] + r[0] for i in piano_roll]
+  samples = []
+  for i in piano_roll:
+    try:
+      a = i.nonzero()[0] + r[0]
+      samples.append(a)
+    except:
+      pass
 
   for i in range(len(samples)):
     for f in samples[i]:
