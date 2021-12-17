@@ -57,7 +57,7 @@ And you should be ready to go to play with code and build upon it!
 
 ### Training
 
-The model is trained on 30 epochs using Adam as an optimizer with a learning rate 0.001. Here are the results from training the LSTM-VAE model:
+The model is trained on 20 epochs using Adam as an optimizer with a learning rate 0.001. Here are the results from training the LSTM-VAE model:
 
 - **KL Loss**
 
