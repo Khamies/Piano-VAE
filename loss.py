@@ -1,52 +1,44 @@
 import torch
 
 
-class VAELoss(torch.nn.Module):
-    def __init__(self):
-        super(VAE_Loss, self).__init__()
+class VAE_Loss(torch.nn.Module):
 
-        self.nlloss = torch.nn.NLLLoss()
+  def __init__(self):
+    super(VAE_Loss, self).__init__()
 
-    @staticmethod
-    def kl_loss(self, mu, log_var, z):
-        """
-        TODO
-        """
-        kl = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
-        kl = kl.sum(
-            -1
-        )  # to go from multi-dimensional z to single dimensional z : (batch_size x latent_size) ---> (batch_size)
-        # i.e Z = [ [z1_1, z1_2 , ...., z1_lt] ] ------> z = [ z1]
-        #         [ [z2_1, z2_2, ....., z2_lt] ]             [ z2]
-        #                   .                                [ . ]
-        #                   .                                [ . ]
-        #         [[zn_1, zn_2, ....., zn_lt] ]              [ zn]
+    self.nlloss = torch.nn.NLLLoss()
+  
+  def KL_loss (self, mu, log_var, z):
 
-        #        lt=latent_size
-        kl = kl.mean()
+    kl = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
+    kl = kl.sum(-1)  # to go from multi-dimensional z to single dimensional z : (batch_size x latent_size) ---> (batch_size) 
+                                                                      # i.e Z = [ [z1_1, z1_2 , ...., z1_lt] ] ------> z = [ z1] 
+                                                                      #         [ [z2_1, z2_2, ....., z2_lt] ]             [ z2]
+                                                                      #                   .                                [ . ]
+                                                                      #                   .                                [ . ]
+                                                                      #         [[zn_1, zn_2, ....., zn_lt] ]              [ zn]
+                                                                      
+                                                                      #        lt=latent_size 
+    kl = kl.mean()
+                                                                      
+    return kl
 
-        return kl
+  def reconstruction_loss(self, x_hat_param, x):
 
-    def reconstruction_loss(self, x_hat_param, x):
-        """
-        TODO
-        """
-        x = x.reshape(-1)
 
-        recon = self.nlloss(x_hat_param, x)
+    x = x.reshape(-1)
 
-        return recon
+    recon = self.nlloss(x_hat_param, x)
 
-    def forward(self, mu, log_var, z, x_hat_param, x):
-        """
-        TODO
-        """
-        kl_loss = self.kl_loss(mu, log_var, z)
-        recon_loss = self.reconstruction_loss(x_hat_param, x)
+    return recon
+  
 
-        elbo = (
-            kl_loss + recon_loss
-        )  # we use + because recon loss is a NLLoss (cross entropy) and it's negative in its own, and in the ELBO equation we have
-        # elbo = KL_loss - recon_loss, therefore, ELBO = KL_loss - (NLLoss) = KL_loss + NLLoss
+  def forward(self, mu, log_var,z, x_hat_param, x):
+    kl_loss = self.KL_loss(mu, log_var, z)
+    recon_loss = self.reconstruction_loss(x_hat_param, x)
 
-        return elbo, kl_loss, recon_loss
+
+    elbo = kl_loss + recon_loss # we use + because recon loss is a NLLoss (cross entropy) and it's negative in its own, and in the ELBO equation we have
+                              # elbo = KL_loss - recon_loss, therefore, ELBO = KL_loss - (NLLoss) = KL_loss + NLLoss
+
+    return elbo, kl_loss, recon_loss
