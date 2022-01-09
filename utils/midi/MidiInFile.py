@@ -7,13 +7,13 @@ from MidiFileParser import MidiFileParser
 class MidiInFile:
 
     """
-    
-    Parses a midi file, and triggers the midi events on the outStream 
+
+    Parses a midi file, and triggers the midi events on the outStream
     object.
-    
+
     Get example data from a minimal midi file, generated with cubase.
     >>> test_file = 'C:/Documents and Settings/maxm/Desktop/temp/midi/src/midi/tests/midifiles/minimal-cubase-type0.mid'
-    
+
     Do parsing, and generate events with MidiToText,
     so we can see what a minimal midi file contains
     >>> from MidiToText import MidiToText
@@ -31,8 +31,8 @@ class MidiInFile:
     End of track
     <BLANKLINE>
     End of file
-    
-    
+
+
     """
 
     def __init__(self, outStream, infile):
@@ -40,16 +40,12 @@ class MidiInFile:
         self.raw_in = RawInstreamFile(infile)
         self.parser = MidiFileParser(self.raw_in, outStream)
 
-
     def read(self):
         "Start parsing the file"
         p = self.parser
         p.parseMThdChunk()
         p.parseMTrkChunks()
 
-
-    def setData(self, data=''):
+    def setData(self, data=""):
         "Sets the data from a plain string"
         self.raw_in.setData(data)
-    
-    
