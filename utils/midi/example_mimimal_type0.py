@@ -5,12 +5,12 @@ This is an example of the smallest possible type 0 midi file, where
 all the midi events are in the same track.
 """
 
-out_file = "midiout/minimal_type0.mid"
+out_file = 'midiout/minimal_type0.mid'
 midi = MidiOutFile(out_file)
 
 # non optional midi framework
 midi.header()
-midi.start_of_track()
+midi.start_of_track() 
 
 
 # musical events
