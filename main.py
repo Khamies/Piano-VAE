@@ -1,14 +1,18 @@
+"""
+Main script
+"""
+# pylint: disable=singleton-comparison
 import argparse
 import torch
 from dataset import PianoGenerationDataset
-from model import LSTM_MUSIC_VAE
+from model import LSTMMusicVAE
 from loss import VAELoss
 from train import Trainer
 from settings import global_setting, training_setting, model_setting
 
 # General Settings
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 torch.manual_seed(global_setting["seed"])
 
 
@@ -29,8 +33,8 @@ bptt = int(args.bptt) if args.bptt != None else training_setting["bptt"]
 embed_size = int(args.embed_size) if args.embed_size != None else training_setting["embed_size"]
 hidden_size = int(args.hidden_size) if args.hidden_size != None else training_setting["hidden_size"]
 latent_size = int(args.latent_size) if args.latent_size != None else training_setting["latent_size"]
-lr = float(args.lr) if args.lr != None else training_setting["lr"]
-lstm_layer = model_setting["lstm_layer"]
+LEARNING_RATE = float(args.lr) if args.lr != None else training_setting["lr"]
+LSTM_LAYER = model_setting["lstm_layer"]
 
 
 # Load the data
@@ -45,17 +49,17 @@ train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuf
 test_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
-vocab_size = model_setting["note_size"]
+VOCAB_SIZE = model_setting["note_size"]
 
-model = LSTM_MUSIC_VAE(
-    vocab_size=vocab_size, embed_size=embed_size, hidden_size=hidden_size, latent_size=latent_size
-).to(device)
+MODEL = LSTMMusicVAE(vocab_size=VOCAB_SIZE, embed_size=embed_size, hidden_size=hidden_size, latent_size=latent_size).to(
+    DEVICE
+)
 
-Loss = Loss = VAELoss()
+LOSS = VAELoss()
 
-optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+optimizer = torch.optim.Adam(MODEL.parameters(), lr=LEARNING_RATE)
 
-trainer = Trainer(train_loader, test_loader, model, Loss, optimizer)
+trainer = Trainer(train_loader, test_loader, MODEL, LOSS, optimizer)
 
 if __name__ == "__main__":
 

@@ -1,16 +1,25 @@
+"""
+Load and process Piano training dataset
+"""
 import os
 import sys
 import numpy as np
 import torch
 
+# pylint: disable=wrong-import-position
 sys.path.append("./utils/midi")
 from utils.midi.midi_utils import midiread
 
 
 class PianoGenerationDataset(torch.utils.data.Dataset):
+    # pylint: disable=no-member
+    """
+    Load and process Piano training dataset
+    """
+
     def __init__(self, midi_folder_path, longest_sequence_length=1491):
         """
-        TODO
+        initialize the class
         """
         self.midi_folder_path = midi_folder_path
 
@@ -26,7 +35,7 @@ class PianoGenerationDataset(torch.utils.data.Dataset):
             self.update_the_max_length()
 
     @staticmethod
-    def midi_filename_to_piano_roll(self, midi_filename):
+    def midi_filename_to_piano_roll(midi_filename):
         """ "
         TODO
         """
@@ -40,7 +49,7 @@ class PianoGenerationDataset(torch.utils.data.Dataset):
         return piano_roll
 
     @staticmethod
-    def pad_piano_roll(self, piano_roll, max_length=132333, pad_value=0):
+    def pad_piano_roll(piano_roll, max_length=132333, pad_value=0):
         """
         TODO
         """
@@ -54,6 +63,9 @@ class PianoGenerationDataset(torch.utils.data.Dataset):
         return padded_piano_roll
 
     def update_the_max_length(self):
+        """
+        update The maximum length
+        """
         sequences_lengths = map(
             lambda filename: self.midi_filename_to_piano_roll(filename).shape[1], self.midi_full_filenames
         )

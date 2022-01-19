@@ -1,9 +1,17 @@
+"""
+Create Train and Evolute LSTM models
+"""
+# pylint: disable=no-member
 import torch
 
 
-class LSTM_MUSIC_VAE(torch.nn.Module):
+class LSTMMusicVAE(torch.nn.Module):
+    """
+    LSTM model with encoder and decoder as well as train, inference methods
+    """
+
     def __init__(self, vocab_size, embed_size, hidden_size, latent_size, num_layers=1):
-        super(LSTM_MUSIC_VAE, self).__init__()
+        super().__init__()
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -50,11 +58,11 @@ class LSTM_MUSIC_VAE(torch.nn.Module):
         state_cell = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(self.device)
         return (hidden_cell, state_cell)
 
-    def get_embedding(self, x):
+    def get_embedding(self, x_input):
         """
         TODO
         """
-        x_embed = self.embed(x)
+        x_embed = self.embed(x_input)
 
         # Total length for pad_packed_sequence method = maximum sequence length
         maximum_sequence_length = x_embed.size(1)
@@ -63,7 +71,7 @@ class LSTM_MUSIC_VAE(torch.nn.Module):
 
     def encoder(self, packed_x_embed, total_padding_length, hidden_encoder):
         """
-        TODO
+        encoder method
         """
         # pad the packed input.
 
@@ -79,18 +87,17 @@ class LSTM_MUSIC_VAE(torch.nn.Module):
 
         # Generate a unit gaussian noise.
         batch_size = output_encoder.size(0)
-        seq_len = output_encoder.size(1)
         noise = torch.randn(batch_size, self.latent_size).to(self.device)
 
-        z = noise * std + mean
+        z_output = noise * std + mean
 
-        return z, mean, log_var, hidden_encoder
+        return z_output, mean, log_var, hidden_encoder
 
-    def decoder(self, z, packed_x_embed, total_padding_length=None):
+    def decoder(self, z_output, packed_x_embed, total_padding_length=None):
         """
-        TODO
+        decoder method
         """
-        hidden_decoder = self.init_hidden_decoder(z)
+        hidden_decoder = self.init_hidden_decoder(z_output)
         hidden_decoder = (hidden_decoder, hidden_decoder)
 
         # pad the packed input.
@@ -110,13 +117,13 @@ class LSTM_MUSIC_VAE(torch.nn.Module):
         binary_x_hat = self.log_softmax(binary_x_hat)
         return (binary_x_hat, hidden_decoder)
 
-    def forward(self, x, sentences_length, hidden_encoder):
+    def forward(self, x_input, sentences_length, hidden_encoder):
         """
         x : bsz * seq_len
         hidden_encoder: ( num_lstm_layers * bsz * hidden_size, num_lstm_layers * bsz * hidden_size)
         """
         # Get Embeddings
-        x_embed, maximum_padding_length = self.get_embedding(x)
+        x_embed, maximum_padding_length = self.get_embedding(x_input)
 
         # Packing the input
         packed_x_embed = torch.nn.utils.rnn.pack_padded_sequence(
@@ -124,34 +131,33 @@ class LSTM_MUSIC_VAE(torch.nn.Module):
         )
 
         # Encoder
-        z, mean, log_var, hidden_encoder = self.encoder(packed_x_embed, maximum_padding_length, hidden_encoder)
+        z_output, mean, log_var, hidden_encoder = self.encoder(packed_x_embed, maximum_padding_length, hidden_encoder)
 
         # Decoder
-        binary_x_hat, _ = self.decoder(z, packed_x_embed, maximum_padding_length)
+        binary_x_hat, _ = self.decoder(z_output, packed_x_embed, maximum_padding_length)
 
-        return binary_x_hat, mean, log_var, z, hidden_encoder
+        return binary_x_hat, mean, log_var, z_output, hidden_encoder
 
-    def inference(self, n_samples, z, sos=None):
+    def inference(self, n_samples, z_output, sos=None):
         """
-        TODO
+        Get prediction given and input and model
         """
         # generate random z
-        batch_size = 1
         sentences_length = torch.tensor([1])
         idx_sample = []
 
         if sos is None:
-            x = torch.zeros(1, 1, self.vocab_size).to(self.device)
-            x[:, :, 30] = 1
+            x_input = torch.zeros(1, 1, self.vocab_size).to(self.device)
+            x_input[:, :, 30] = 1
 
-        hidden_decoder = self.init_hidden_decoder(z)
+        hidden_decoder = self.init_hidden_decoder(z_output)
         hidden_decoder = (hidden_decoder, hidden_decoder)
 
         with torch.no_grad():
 
-            for i in range(n_samples):
+            for _ in range(n_samples):
 
-                x_embed, max_sentence_length = self.get_embedding(x)
+                x_embed, max_sentence_length = self.get_embedding(x_input)
                 # Packing the input
                 packed_x_embed = torch.nn.utils.rnn.pack_padded_sequence(
                     input=x_embed, lengths=sentences_length, batch_first=True, enforce_sorted=False
@@ -172,7 +178,7 @@ class LSTM_MUSIC_VAE(torch.nn.Module):
                 sample = sample.squeeze().unsqueeze(0).unsqueeze(1)  # (88,1) -> (1,1,88)
                 idx_sample.append(sample)
 
-                x = sample.float()
+                x_input = sample.float()
 
         note_samples = idx_sample
         note_samples = torch.stack(note_samples).squeeze(1).squeeze(1)
