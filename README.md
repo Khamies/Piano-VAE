@@ -14,6 +14,7 @@ A Pytorch Implementation of VAE-based musical model to generate and interpolate 
 - **[Training](#Training)**
 - **[Inference](#Inference)**
 - **[Play with the model](#Play-with-the-model)**
+- **[Acknowledgement](#Acknowledgement)**
 - **[Connect with me](#Connect-with-me)**
 - **[License](#License)** 
 
@@ -116,6 +117,12 @@ An interpolation close to "second audio"
 ## Play with the model
 
 To play with the model, a jupyter notebook has been provided, you can find it [here](https://github.com/Khamies/Piano-VAE/blob/main/Play_with_model.ipynb)
+
+
+
+### Acknowledgement
+
+- Big thanks to @montaserFath for reviewing the code!
 
 ### Citation
 
